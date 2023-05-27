@@ -16,8 +16,8 @@ aspect_vectorizer = joblib.load('tfidf_Aspek.sav')
 aspect_svm = joblib.load('Aspek_Model.sav')
 
 # Load the saved TF-IDF vectorizer for sentiment prediction
-sentiment_vectorizer = joblib.load('tfidf_label.sav')
-sentiment_svm = joblib.load('Label_Model.sav')
+sentiment_vectorizer = joblib.load('tfidf_label_DataSekunder_2.1.sav')
+sentiment_svm = joblib.load('Label_Model_DataSekunder_2.1.sav')
 
 def preprocess_text(text):
     # Remove stock market tickers like $GE
