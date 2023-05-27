@@ -9,6 +9,7 @@ import nltk
 from nltk.corpus import stopwords
 import string
 from nltk.stem import PorterStemmer
+import webbrowser
 
 # Load the saved TF-IDF vectorizer for aspect prediction
 aspect_vectorizer = joblib.load('tfidf_Aspek.sav')
@@ -93,22 +94,63 @@ def predict_multiple_data(file_path):
     # Return the data with the predicted columns
     return data[['text', 'Predicted Aspect', 'Predicted Sentiment']]
 
-
 def display_predictions(data):
+    # Calculate total text count
+    total_texts = len(data)
+    
+    # Calculate total text count for each aspect
+    total_pelayanan = len(data[data['Predicted Aspect'] == 'Pelayanan'])
+    total_keamanan = len(data[data['Predicted Aspect'] == 'Keamanan'])
+    total_lingkungan = len(data[data['Predicted Aspect'] == 'Lingkungan Fisik'])
+    total_umum = len(data[data['Predicted Aspect'] == 'Umum'])
+    
+    # Calculate total positive predictions
+    total_positive = len(data[data['Predicted Sentiment'] == 'Positif'])
+    # Calculate total negative predictions
+    total_negative = len(data[data['Predicted Sentiment'] == 'Negatif'])
+
+    # Create a dataframe for total counts
+    total_counts1 = pd.DataFrame({
+        'Total Texts': [total_texts],
+        'Total Positive': [total_positive],
+        'Total Negative': [total_negative]
+    })
+
+    total_counts2 = pd.DataFrame({
+        'Total Pelayanan': [total_pelayanan],
+        'Total Keamanan': [total_keamanan],
+        'Total Lingkungan Fisik': [total_lingkungan],
+        'Total Umum': [total_umum]
+    })
+
+    # Display the total counts table
+    st.table(total_counts1)
+    st.table(total_counts2)
+
     # Display the predictions in a table
-    st.table(data)
+    st.table(data[['text', 'Predicted Aspect', 'Predicted Sentiment']])
 
 def main():
     # Set page title and header
-    st.title("Text Classification Demo")
-    st.header("Aspect and Sentiment Prediction")
+    st.title("Sentimen Analysis Opini Masyarakat Terhadap Polres Ponorogo")
+
+    # Add a button to redirect to a link
+    button_link = st.button("Dashboard Sentimen Analysis Opini Masyarakat Terhadap Polres Ponorogo")
+    if button_link:
+        # Define the link URL
+        link_url = "https://public.tableau.com/app/profile/fawwaz.kumudani.widyadhana/viz/SentimenAnalysisOpiniMasyarakatTerhadapPolresPonorogo/DashboardPelayanan?publish=yes"  # Replace with your desired link
+
+        # Open the link in a new tab
+        webbrowser.open_new_tab(link_url)
 
     # Take user input
-    option = st.selectbox("Select an option:", ("Single Text Prediction", "Multiple Text Prediction"))
+    option = st.selectbox("Pilih Opsi:", ("Prediksi Text", "Prediksi Banyak Teks"))
 
-    if option == "Single Text Prediction":
-        user_input = st.text_input("Enter the text:")
-        prediction_button = st.button("Predict")
+    if option == "Prediksi Text":
+        user_input = st.text_input("Masukkan Text:")
+        col1, col2 = st.columns([1, 7])
+        prediction_button = col1.button("Prediksi")
+        clear_button = col2.button("Clear")
 
         if prediction_button:
             # Perform prediction
@@ -116,20 +158,26 @@ def main():
 
             # Display predictions in a table
             predictions = pd.DataFrame({
-                "Input Text": [user_input],
-                "Predicted Sentiment": [sentiment_label],
-                "Predicted Aspect": [aspect_pred]
+                "Text": [user_input],
+                "Prediksi Sentimen": [sentiment_label],
+                "Prediksi Aspek": [aspect_pred]
             })
             st.table(predictions)
-    elif option == "Multiple Text Prediction":
-        file_path = st.file_uploader("Upload Excel file", type=["xlsx"])
+
+        if clear_button:
+            user_input = ""
+
+    elif option == "Prediksi Banyak Teks":
+        file_path = st.file_uploader("Upload File Excel", type=["xlsx"])
 
         if file_path is not None:
             # Perform prediction for multiple data and get the predicted sentiments
             predicted_sentiments = predict_multiple_data(file_path)
 
-            # Display the predicted sentiments
-            st.table(predicted_sentiments)
+            # Display total counts and predicted sentiments
+            display_predictions(predicted_sentiments)
+
+
 
 if __name__ == "__main__":
     main()
