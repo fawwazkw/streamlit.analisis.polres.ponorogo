@@ -1,15 +1,14 @@
 import pandas as pd
-import joblib
-import streamlit as st
-import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import SVC
-from nltk.tokenize import TweetTokenizer
-import nltk
-from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
+import nltk 
 import string
-from nltk.stem import PorterStemmer
-import webbrowser
+import re
+import joblib
+from nltk.corpus import stopwords 
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from nltk.tokenize import TweetTokenizer
+import streamlit as st
 
 # Load the saved TF-IDF vectorizer for aspect prediction
 aspect_vectorizer = joblib.load('tfidf_Aspek.sav')
@@ -34,13 +33,9 @@ def preprocess_text(text):
     text = re.sub('[0-9]+', '', text)
     # Tokenize text
     tokenizer = TweetTokenizer(preserve_case=False, strip_handles=True, reduce_len=True)
-    stemmer = PorterStemmer()
     text_tokens = tokenizer.tokenize(text)
-    # Remove stopwords, and punctuation, and stem words
-    nltk.download('stopwords')
-    stopwords_indonesia = stopwords.words('indonesian')
-    texts_clean = [stemmer.stem(word) for word in text_tokens if (word not in stopwords_indonesia and word not in string.punctuation)]
-    
+    # Remove stopwords, emoticons, and punctuation, and stem words
+    texts_clean = [stemmer.stem(word) for word in text_tokens if (word.lower() not in stopwords_indonesia and word not in emoticons and word not in string.punctuation) or word in ['kurang', 'tidak','belum','perlu','lama']]  # Add exception 
     return ' '.join(texts_clean)
 
 @st.cache_data()
