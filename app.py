@@ -18,6 +18,9 @@ aspect_svm = joblib.load('Aspek_Model.sav')
 sentiment_vectorizer = joblib.load('tfidf_label_DataSekunder_2.1.sav')
 sentiment_svm = joblib.load('Label_Model_DataSekunder_2.1.sav')
 
+nltk.download('stopwords')
+stopwords_indonesia = set(stopwords.words('indonesian'))
+
 def preprocess_text(text):
     # Remove stock market tickers like $GE
     text = re.sub(r'\$\w*', '', text)
