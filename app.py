@@ -9,6 +9,7 @@ from nltk.corpus import stopwords
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import TweetTokenizer
 import streamlit as st
+import webbrowser
 
 # Load the saved TF-IDF vectorizer for aspect prediction
 aspect_vectorizer = joblib.load('tfidf_Aspek.sav')
